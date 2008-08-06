@@ -1,0 +1,42 @@
+#!/usr/bin/python
+from subprocess import Popen, PIPE
+import os, tempfile
+
+def darcsRoot():
+    """path of the nearest _darcs dir in this dir or a parent"""
+    d = os.getcwd()
+    while d and not os.path.isdir(os.path.join(d, "_darcs")):
+        d = os.path.join(d, "..")
+    return d
+        
+
+def filesWithChanges():
+    files = []
+    for line in Popen(["darcs", "wh", "-s"], stdout=PIPE).stdout:
+        words = line.split()
+        if words[0] == "M":
+            files.append(words[1])
+    return files
+
+def stripeFiles(inputFilenames, outputFilename):
+    """append lines like this to the output:
+    input1: firstline
+    input1: secondline
+    input2: firstline
+    """
+    os.system("egrep '' %s >> %s" % (" ".join(inputFilenames), outputFilename))
+
+files = filesWithChanges()
+diffSides = []
+for desc in ["_darcs/current versions on this side\n\n",
+             "working versions on this side\n\n"]:
+    diffSides.append(tempfile.NamedTemporaryFile())
+    diffSides[-1].write(desc)
+    diffSides[-1].flush()
+
+os.chdir(darcsRoot())
+stripeFiles(files, diffSides[1].name)
+os.chdir("_darcs/pristine")
+stripeFiles(files, diffSides[0].name)
+
+os.system("tkdiff %s %s" % (diffSides[0].name, diffSides[1].name))
