@@ -3,24 +3,122 @@
 "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <title></title>
+    <title>darcs diff viewer</title>
+    <link rel="stylesheet" type="text/css" 
+	  href="ext-2.1/resources/css/ext-all.css" />
+    <script type="text/javascript" 
+	    src="ext-2.1/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript">
+      Ext.BLANK_IMAGE_URL = "ext-2.1/resources/images/default/s.gif";
+    </script>
+    <script type="text/javascript" src="ext-2.1/ext-all.js"></script>
+    <script type="text/javascript">
+      // <![CDATA[
+Ext.onReady(function(){
+    
+    //Ext.state.Manager.setProvider(
+    //        new Ext.state.SessionProvider({state: Ext.appState}));
+
+    var root = new Ext.tree.TreeNode({text: "hello"});
+
+
+    var diffs = new Ext.Panel({
+        region: 'west',
+	title: 'Current diffs',
+//        contentEl : 'diffs',
+	items: [
+	    new Ext.tree.TreePanel({
+		root: root
+	    })
+	    ]
+    });
+
+    // Panel for the west
+    var commentPanel = new Ext.form.FormPanel({
+        title: 'Patch comment',
+        region: 'center',
+        width: 300,
+	submit : function() { alert("submit"); },
+	buttons : [
+	    {xtype: "button",
+	     text: "Record",
+	     type: "submit"
+	    }
+	],
+	items: [
+	    {xtype: "textarea",
+	     fieldLabel: "Comment",
+	     emptyText: "(first line is used as short summary)",
+	     grow: true
+	    }
+	]
+    });
+
+    var win = new Ext.Panel({
+        title: 'Layout Window',
+	renderTo: 'ui',
+        width:600,
+        height:350,
+        //border:false,
+//        plain:true,
+        layout: 'border',
+
+        items: [diffs, commentPanel]
+    });
+    win.render('ui');
+
+});
+      // ]]>
+    </script>
   </head>
   <body>
 
-<pre>
-    Current diffs:
+    <div id="diffs">
 
- file1                    summary for enabled sections:
-                          _________________
-file2
-  [x] changed section
-..
+<div style="white-space: pre">
+[x] hunk ./webcheckin.html 71
+<span style="text-decoration:line-through;">-&lt;pre&gt;</span>
+<span style="text-decoration:line-through;">    Current diffs:</span>
+<span style="font-style: italic;">    &lt;div id="diffs"&gt;
+      some diffs that get wider wider wider
+    &lt;/div&gt;
+    $
+    &lt;div id="log"&gt;
+      Log window
+    &lt;/div&gt;</span>
+ 
+hunk ./webcheckin.html 79
+- file1                    summary for enabled sections:
++    &lt;div id="ui"&gt;&lt;/div&gt;
++    $
++
++&lt;pre&gt;
++      Current diffs:
++      $
++ file1                    log summary for enabled sections:
+                           _________________
+ file2
+   [x] changed section
+</div>
+
+    </div>
+    
+    <div id="log">
+      Log window
+    </div>
+
+    <div id="ui"></div>
+    
+
+<pre>
+    
+/------------------------------------------------\
+| darcs status: getting diffs .. checking in ..  |
+|                                                |
+
 </pre>
 
 refresh in the background, so i see where my diffs are happening and
 how many i have
-
-
-
   </body>
 </html>
